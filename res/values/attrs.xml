@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="sliding_menu">
+        <attr name="sliding_menu_animation_millis" format="integer" />
+        <attr name="sliding_menu_x_displacement" format="float" />
+        <attr name="sliding_menu_y_displacement" format="float" />
+    </declare-styleable>
+
+</resources>
