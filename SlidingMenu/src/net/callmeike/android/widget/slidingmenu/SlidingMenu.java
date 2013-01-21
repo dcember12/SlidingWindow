@@ -18,7 +18,6 @@ package net.callmeike.android.widget.slidingmenu;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -30,7 +29,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
-import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 
@@ -56,8 +55,8 @@ public class SlidingMenu extends ListView {
     private final Rect sliderMargins = new Rect();
 
     private View menuRoot;
+    private View slidingView;
     private ViewGroup rootView;
-    private ViewGroup slidingView;
 
     private boolean animating;
     private boolean visible;
@@ -134,7 +133,7 @@ public class SlidingMenu extends ListView {
      * @param root a parent of this view that represents the menu: allows for titles and such
      * @param slider the view that will be moved aside, to make room for the menu
      */
-    public void setContainerView(View root, ViewGroup slider) {
+    public void setContainerView(View root, View slider) {
         this.menuRoot = root;
         this.slidingView = slider;
         this.rootView = (ViewGroup) slidingView.getParent();
@@ -166,7 +165,7 @@ public class SlidingMenu extends ListView {
     }
 
     /**
-     * forceably remove the menu
+     * forcibly remove the menu: in onPause(), e.g.,
      */
     public void reset() {
          if (animating) { visible = false; }
@@ -201,8 +200,8 @@ public class SlidingMenu extends ListView {
     private void show() {
         Log.d(TAG, "show");
 
+        // this is a great place to make the slider opaque
         Point delta = getDisplacement();
-        slidingView.setBackgroundColor(Color.BLACK);
         moveSlider(delta.x, delta.y);
         addMenu();
 
@@ -234,7 +233,7 @@ public class SlidingMenu extends ListView {
     }
 
     private void addMenu() {
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 Gravity.LEFT);
@@ -255,7 +254,7 @@ public class SlidingMenu extends ListView {
     private void removeMenu() {
         rootView.removeView(menuRoot);
         moveSlider(0, 0);
-        slidingView.setBackgroundColor(Color.TRANSPARENT);
+        // this is a great place to restore the original slider color
         visible = false;
     }
 
