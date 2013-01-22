@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+    Be sure to refer to these with a namespace definition that points at
+    *your own application*, like this:
+
+    &lt;net.callmeike.android.widget.slidingwindow.SlidingWindow
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:slider="http://schemas.android.com/apk/res/MY.PACKAGE.NAME"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        slider:sliding_window_animation_millis="700"
+        slider:sliding_window_x_displacement="0.7"
+        slider:sliding_window_y_displacement="0.0" >
+     -->
+    
+    <declare-styleable name="sliding_window">
+        <attr name="sliding_window_animation_millis" format="integer" />
+        <attr name="sliding_window_x_displacement" format="float" />
+        <attr name="sliding_window_y_displacement" format="float" />
+    </declare-styleable>
+
+</resources>

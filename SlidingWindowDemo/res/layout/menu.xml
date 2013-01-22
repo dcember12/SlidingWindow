@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<net.callmeike.android.widget.slidingwindow.SlidingWindow
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:slider="http://schemas.android.com/apk/res/net.callmeike.android.demo.slidingwindow"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="12dp"
+    android:paddingLeft="4dp"
+    android:paddingTop="32dp"
+    slider:sliding_window_animation_millis="700"
+    slider:sliding_window_x_displacement="0.7"
+    slider:sliding_window_y_displacement="0.0" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_label"
+            android:textSize="24sp" />
+
+        <ListView
+            android:id="@+id/menu_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/background_light"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="2dp" />
+    </LinearLayout>
+
+</net.callmeike.android.widget.slidingwindow.SlidingWindow>
