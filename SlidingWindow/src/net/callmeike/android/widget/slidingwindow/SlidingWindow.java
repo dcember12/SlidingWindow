@@ -15,23 +15,20 @@
 */
 package net.callmeike.android.widget.slidingwindow;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-
 import net.callmeike.android.widget.slidingwindow.BuildConfig;
 
 
@@ -53,8 +50,6 @@ public class SlidingWindow extends FrameLayout {
 
     private final int ANIMATION_MILLIS;
     private final PointF DISPLACEMENT = new PointF();
-
-    private final Rect sliderMargins = new Rect();
 
     private View slidingView;
     private ViewGroup rootView;
@@ -105,7 +100,7 @@ public class SlidingWindow extends FrameLayout {
                         int attr = atts.getIndex(i);
                         switch (attr) {
                             case R.styleable.sliding_window_sliding_window_animation_millis:
-                                animationMillis = atts.getDimensionPixelSize(attr, animationMillis);
+                                animationMillis = atts.getInt(attr, animationMillis);
                                 break;
 
                             case R.styleable.sliding_window_sliding_window_x_displacement:
@@ -144,9 +139,11 @@ public class SlidingWindow extends FrameLayout {
 
         ViewGroup.MarginLayoutParams lp
             = (ViewGroup.MarginLayoutParams) slidingView.getLayoutParams();
-        Log.d(TAG, "root: " + rootView + ", slider: " + slider + ", margins: " + lp);
+        lp.setMargins(lp.leftMargin, lp.topMargin, lp.rightMargin, lp.bottomMargin);
 
-        sliderMargins.set(lp.leftMargin, lp.topMargin, lp.rightMargin, lp.bottomMargin);
+        rootView.addView(this);
+
+        setVisibility(View.GONE);
     }
 
     /**
@@ -175,27 +172,29 @@ public class SlidingWindow extends FrameLayout {
      */
     public void reset() {
          if (animating) { visible = false; }
-         else if (visible) { removeSlider(); }
+         else if (visible) { hideLowerView(); }
     }
 
-    void onShowComplete() {
+    void onShowComplete(Point delta) {
         animating = false;
-        if (!visible) { removeSlider(); }
-        else { setEnabled(true); }
+        if (!visible) { hideLowerView(); }
+        else { moveSlider(delta.x, delta.y); }
     }
 
-    // !!! There's a disturbing flash at the end of the animation...
     void onHideComplete() {
         animating = false;
-        removeSlider();
+        moveSlider(0, 0);
+        hideLowerView();
     }
 
     private void hide() {
         Log.d(TAG, "hide");
 
         Point delta = getDisplacement();
+        moveSlider(0, 0);
+
         animate(
-            new TranslateAnimation(0, -delta.x, 0, -delta.y),
+            new TranslateAnimation(delta.x, 0, delta.y, 0),
             new Animation.AnimationListener() {
                 @Override public void onAnimationEnd(Animation a) { onHideComplete(); }
                 @Override public void onAnimationRepeat(Animation a) { }
@@ -207,14 +206,16 @@ public class SlidingWindow extends FrameLayout {
         Log.d(TAG, "show");
 
         // this is a great place to make the slider opaque
-        Point delta = getDisplacement();
+
+        showLowerView();
+
+        final Point delta = getDisplacement();
         moveSlider(delta.x, delta.y);
-        addSlider();
 
         animate(
             new TranslateAnimation(-delta.x, 0, -delta.y, 0),
             new Animation.AnimationListener() {
-                @Override public void onAnimationEnd(Animation a) { onShowComplete(); }
+                @Override public void onAnimationEnd(Animation a) { onShowComplete(delta); }
                 @Override public void onAnimationRepeat(Animation a) { }
                 @Override public void onAnimationStart(Animation a) { }
             });
@@ -226,40 +227,21 @@ public class SlidingWindow extends FrameLayout {
             Math.round((rootView.getBottom() - rootView.getTop()) * DISPLACEMENT.y));
     }
 
+    @SuppressLint("NewApi")
     private void moveSlider(int deltaX, int deltaY) {
         Log.d(TAG, "move: " + deltaX + ", " + deltaY);
-        ViewGroup.MarginLayoutParams lp
-            = (ViewGroup.MarginLayoutParams) slidingView.getLayoutParams();
-        lp.setMargins(
-            sliderMargins.left + deltaX,
-            sliderMargins.top + deltaY,
-            sliderMargins.right - deltaX,
-            sliderMargins.bottom - deltaY);
-        slidingView.setLayoutParams(lp);
+        slidingView.setTranslationX(deltaX);
+        slidingView.setTranslationY(deltaY);
     }
 
-    private void addSlider() {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                Gravity.LEFT);
-
-        params.setMargins(
-            sliderMargins.left,
-            sliderMargins.top,
-            sliderMargins.right,
-            sliderMargins.bottom);
-        setLayoutParams(params);
-
-        rootView.addView(this);
+    private void showLowerView() {
+        setVisibility(View.VISIBLE);
         rootView.bringChildToFront(slidingView);
-
         visible = true;
     }
 
-    private void removeSlider() {
-        rootView.removeView(this);
-        moveSlider(0, 0);
+    private void hideLowerView() {
+        setVisibility(View.GONE);
         // this is a great place to restore the original slider color
         visible = false;
     }
